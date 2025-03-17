@@ -1,0 +1,41 @@
+pipeline {
+    agent any
+    environment {
+        // No need to set JAVA_HOME explicitly if java 17 is globally available
+        MAVEN_HOME = '/usr/share/maven'
+    }
+    stages {
+        stage('Clone Repository') {
+            steps {
+                echo 'Cloning repository...'
+                git  branch: 'main',credentialsId: 'github-credentials-id', url: 'https://github.com/Manmadha007/SimpleJavaProject.git'
+            }
+        }
+        stage('Build') {
+            steps {
+                echo 'Building the project using Maven...'
+                sh "${MAVEN_HOME}/bin/mvn clean compile"
+            }
+        }
+        stage('Run Tests') {
+            steps {
+                echo 'Running tests...'
+                sh "${MAVEN_HOME}/bin/mvn test"
+            }
+        }
+        stage('Package') {
+            steps {
+                echo 'Packaging the application...'
+                sh "${MAVEN_HOME}/bin/mvn package"
+            }
+        }
+    }
+    post {
+        success {
+            echo 'Pipeline executed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Check the logs for details.'
+        }
+    }
+}
